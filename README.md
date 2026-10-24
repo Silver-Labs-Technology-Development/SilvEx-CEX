@@ -1,93 +1,75 @@
 # SilvEx CEX
 
-Centralized exchange services for the Silver Labs ecosystem.
-
-**Status: planned — scaffold only.** No account ledger, order book, matching
-engine, custody adapter, or admin surface exists in this repository yet. This
-project is a high-risk custody product and must not be operated with real funds
-without legal, security, and operations review.
+> **Status: Planned — repository and scope only.**
+> This repository contains no exchange implementation. There are no accounts,
+> custody, order books, matching, deposits, withdrawals, trading, or real-fund
+> capabilities here.
 
 ## Purpose
 
-Provide a centralized venue where users can trade listed assets against an
-operator-managed ledger. The exchange owns the order book and the account
-balances; on-chain settlement happens only at deposit and withdrawal
-boundaries.
+SilvEx CEX is the centralized-exchange product boundary for Silver Labs. It is
+intended to cover account and ledger services, order matching, custody
+integration, deposit/withdrawal operations, risk controls, and the operational
+tooling a centralized venue requires.
 
-## Scope
+It is a separate product from SilvEx DEX and SilvEx DEX Node. Centralized
+custody and on-chain, wallet-authorized swaps must not be presented as the same
+system.
 
-Planned work, in dependency order:
+## Proposed scope
 
-1. **Accounts and ledger** — a double-entry ledger with idempotent transfers,
-   holds, fees, and an audit trail.
-2. **Order lifecycle** — validation, placement, cancel, expiry, and partial
-   fills with deterministic identifiers.
-3. **Matching engine** — price-time priority matching with replayable input and
-   output logs.
-4. **Market data** — public ticker, trades, and depth derived from the engine.
-5. **Deposit and withdrawal adapters** — chain watchers, confirmation policy,
-   address allocation, and operator-approved withdrawals.
-6. **Risk and compliance** — limits, velocity checks, sanctions/KYC hooks, and
-   suspicious-activity reporting interfaces.
-7. **Operations** — reconciliation, cold/hot wallet policy, incident runbooks,
-   metrics, and audit exports.
+- Account, identity, and ledger model.
+- Order lifecycle and matching-engine design.
+- Deposit and withdrawal workflows with explicit custody and reconciliation
+  rules.
+- Market-data and trade-history services.
+- Administrative, risk, and audit controls.
+- Test environments and reproducible operational runbooks.
 
-## Out of scope
+## Explicitly out of scope until reviewed and approved
 
-- Non-custodial swaps or wallet-authorized settlement (that is `SilvEx-DEX`
-  and `SilvEx-DEX-Node`).
-- Consensus changes or a replacement BTCS node.
-- A consumer wallet or payment processor (that is `SilverPay`).
-- Real-value operation before licensing, custody, and audit decisions.
-
-## Planned components
-
-| Component | Responsibility | Notes |
-| --- | --- | --- |
-| `ledger/` | Double-entry balances, holds, fees | Money-critical |
-| `matching/` | Deterministic order matching | Replayable logs |
-| `orders/` | Order validation and lifecycle | Idempotent API |
-| `marketdata/` | Ticker, trades, depth | Public, read-only |
-| `custody/` | Deposit watchers and withdrawal proposals | No keys in app code |
-| `risk/` | Limits and compliance hooks | External providers |
-| `admin/` | Operator controls and audit views | Strong auth required |
-| `api/` | Client-facing endpoints | Authenticated |
-
-The directory names are proposed. They are not created yet.
+- Real-fund custody or trading.
+- Mainnet deployment.
+- Any claim of regulatory compliance, solvency, insurance, or audit status.
+- Reuse of upstream exchange code without a license and security review.
 
 ## Integration points
 
-- [btcs-core](https://github.com/Silver-Labs-Technology-Development/Silver-Labs-Bitcoin-Silver-Development)
-  — BTCS L1 deposits, withdrawals, and confirmation policy.
-- [btcs-l2](https://github.com/Silver-Labs-Technology-Development/btcs-l2)
-  — L2 asset deposits and withdrawals, if listed.
-- [SilverPay](https://github.com/Silver-Labs-Technology-Development/SilverPay)
-  — optional client-side wallet connection, never custody.
-- [Silver-Scan](https://github.com/Silver-Labs-Technology-Development/Silver-Scan)
-  — public transaction references and operator reconciliation.
-- [silver-labs-platform](https://github.com/Silver-Labs-Technology-Development/silver-labs-platform)
-  — shared schemas and client conventions.
+- **BTCS Core** — L1 RPC and deposit/withdrawal observation.
+- **SilverPay** — account, wallet, and signing boundaries where applicable.
+- **silver-labs-platform** — shared schemas and integration contracts.
+- **Silver Scan** — transaction and address visibility.
+- **SilvEx DEX / DEX Node** — separate products; integration is not implied.
 
-## Local development
+## Decisions required before implementation
 
-There is no runnable code yet. Future development must use a disposable local
-ledger and test assets only. No mainnet keys, real customer data, or production
-wallet files may be used in this repository.
+1. Build, fork, or integrate an existing engine, with a documented license and
+   security review.
+2. Custody model, key management, segregation, and reconciliation rules.
+3. Jurisdiction, identity, AML/KYC, and record-retention requirements.
+4. Matching-engine semantics, ledger invariants, and failure recovery.
+5. Threat model, incident response, and independent security review plan.
 
-## Safety and release status
+OpenCEX has been identified only as an upstream candidate. It is Apache-2.0,
+described by its maintainers as unmaintained and as-is, and has **not** been
+adopted or copied into this repository.
 
-This is a development scaffold. It is **not** a licensed exchange, not a
-custody service, and not authorized for real-value trading. Required before any
-real-value use:
+## First milestone
 
-- Legal and regulatory review for each operating jurisdiction.
-- Independent security audit of ledger, matching, custody, and withdrawal
-  paths.
-- KYC/AML and sanctions program, with an accountable operator.
-- Proof-of-reserves and reconciliation procedures.
-- Incident response and withdrawal-limit policy.
+A reviewed architecture decision and threat model, followed by a local
+simulation with test accounts. No real funds and no public trading interface.
 
-See [`SECURITY.md`](SECURITY.md).
+## Repository facts
+
+- Local workspace path: `~/Silver-Labs/SilvEx-CEX`
+- Default branch: `main`
+- Implementation: none
+- Tests run: none (no code)
+- License: no license selected; no reuse rights are granted
+- Visibility: public planning repository
+
+This repository is labeled planned so that its existence is not mistaken for a
+working exchange.
 
 ## Repository layout
 
@@ -101,13 +83,18 @@ See [`SECURITY.md`](SECURITY.md).
     └── ARCHITECTURE.md
 ```
 
+## Architecture note
+
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) records a candidate component
+breakdown and threat model. It is subordinate to the scope and decisions above
+and does not authorize implementation.
+
+## Security
+
+See [`SECURITY.md`](SECURITY.md) for the reporting policy and security
+boundaries. No implementation, test suite, or independent audit exists yet.
+
 ## License
 
 No open-source license is granted. See [`LICENSE`](LICENSE). The repository is
 public for review and development, not for reuse or redistribution.
-
-## Related repositories
-
-- [SilvEx DEX](https://github.com/Silver-Labs-Technology-Development/SilvEx-DEX)
-- [SilvEx DEX Node](https://github.com/Silver-Labs-Technology-Development/SilvEx-DEX-Node)
-- [Silver Labs workspace](https://github.com/orgs/Silver-Labs-Technology-Development/repositories)
